@@ -1,33 +1,153 @@
 # Tagihboss-vue
----
-**Server Requirement Redis**
-   * $ sudo apt install redis-server
----
-**Composer here**
-1. $ npm sudo apt install nodejs 
-2. $ npm laravel-echo-server 
-3. $ npm install -g laravel-echo-server 
-4. **cd Tagihboss-vue Add predis**
-    * $ composer require predis/predis Add laravel-echo and socket.io client 
-    * $ npm install --save laravel-echo socket.io-client@2.4.0
-5. **Create laravel-echo-server & configuration laravel-echo-server init Specify .env**
-    * BROADCAST_DRIVER=redis
-    * REDIS_HOST=127.0.0.1 
-    * REDIS_PASSWORD=null
-    * REDIS_PORT=6379
-    * REDIS_CLIENT=predis
-    * REDIS_PREFIX=""
-    * .....
-    * LARAVEL_ECHO_SERVER_REDIS_HOST=127.0.0.1
-    * LARAVEL_ECHO_SERVER_REDIS_PORT=6379
-    * LARAVEL_ECHO_SERVER_REDIS_PASSWORD=null
-6. **Finish**
-    * Start laravel-echo-server laravel-echo-server start
-    * Start Laravel queue php artisan queue:listen redis --queue=default
-    * Start Laravel app php artisan serve
-    * Open URL two tabs/browsers [http://localhost:8000]
-    * When you hit first URL you will see Hello! from second URL.
-    * DONE, have a good day!
+### Server Requirement
+- Redis `sudo apt install redis-server`
+- Composer [here](https://getcomposer.org/download/)
+- npm `sudo apt install nodejs npm`
+- laravel-echo-server `npm install -g laravel-echo-server`
+
+### Laravel Dependencies Requirement
+- predis
+- laravel-echo
+- socket.io-client ^2.4.0 [issue](https://github.com/laravel/echo/issues/237#issuecomment-731308117)
+
+### Installation
+- Install fresh laravel via Composer `laravel new laravel-socket-io`
+- Go to Laravel directory `cd Tagihboss-vue`
+- Add predis `composer require predis/predis`
+- Add laravel-echo and socket.io client `npm install --save laravel-echo socket.io-client@2.4.0`
+- Create laravel-echo-server configuration `laravel-echo-server init`
+- Specify `.env`
+```
+...
+### Broadcast
+BROADCAST_DRIVER=redis
+...
+### Redis
+REDIS_HOST=127.0.0.1
+REDIS_PASSWORD=null
+REDIS_PORT=6379
+REDIS_CLIENT=predis
+REDIS_PREFIX=""
+...
+### Laravel Echo Server
+LARAVEL_ECHO_SERVER_REDIS_HOST=127.0.0.1
+LARAVEL_ECHO_SERVER_REDIS_PORT=6379
+LARAVEL_ECHO_SERVER_REDIS_PASSWORD=null
+```
+- Create new file `resources/js/echo.js`
+```js
+### echo.js
+import Echo from 'laravel-echo';
+
+window.io = require('socket.io-client');
+
+window.Echo = new Echo({
+    broadcaster: 'socket.io',
+    host: window.location.hostname + ':6001'
+});
+```
+- Add `require('./echo.js');` at bottom of file `resources/js/app.js`
+- Run `npm install`
+- Run `npm run dev`
+- Enable channel route, Uncomment `App\Providers\BroadcastServiceProvider::class,`
+- Add route `routes/channels.php`
+```php
+...
+Broadcast::channel('EveryoneChannel', function () {
+    return true;
+});
+...
+```
+- Create new event `php artisan make:event EveryoneEvent` and edit
+```php
+<?php
+
+namespace App\Events;
+
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+
+class EveryoneEvent implements ShouldBroadcast
+{
+    use Dispatchable, InteractsWithSockets, SerializesModels;
+    
+    /**
+    * The name of the queue connection to use when broadcasting the event.
+    *
+    * @var string
+    */
+    public $connection = 'redis';
+
+    /**
+    * The name of the queue on which to place the broadcasting job.
+    *
+    * @var string
+    */
+    public $queue = 'default';
+
+    /**
+     * Create a new event instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    /**
+     * Get the channels the event should broadcast on.
+     *
+     * @return \Illuminate\Broadcasting\Channel|array
+     */
+    public function broadcastOn()
+    {
+        return new Channel('EveryoneChannel');
+    }
+
+    /*
+     * The Event's broadcast name.
+     * 
+     * @return string
+     */
+    public function broadcastAs()
+    {
+        return 'EveryoneMessage';
+    }
+    
+    /*
+     * Get the data to broadcast.
+     *
+     * @return array
+     */
+    public function broadcastWith()
+    {
+        return [
+            'message'=> 'Hello!'
+        ];
+    }
+}
+```
+- Add route for send and receiver broadcast at file `routes/web.php`
+```php
+...
+Route::get('/send', function () {
+    broadcast(new App\Events\EveryoneEvent());
+    return response('Sent');
+});
+...
+```
+- Start laravel-echo-server `laravel-echo-server start`
+- Start Laravel queue `php artisan queue:listen redis --queue=default`
+- Start Laravel app `php artisan serve`
+- Open URL two tabs/browsers
+  1. http://localhost:8000/send
+  2. http://localhost:8000/receiver
+- When you hit first URL you will see `Hello!` from second URL.
+- DONE, have a good day!
 
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
 
