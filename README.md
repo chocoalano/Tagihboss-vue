@@ -1,7 +1,9 @@
 # Tagihboss-vue
-- **Server Requirement Redis**
-- $ sudo apt install redis-server 
-- **Composer here**
+---
+**Server Requirement Redis**
+   * $ sudo apt install redis-server
+---
+**Composer here**
 1. $ npm sudo apt install nodejs 
 2. $ npm laravel-echo-server 
 3. $ npm install -g laravel-echo-server 
