@@ -3,32 +3,29 @@
 - $ sudo apt install redis-server 
 ---
 - **Composer here**
----
-- $ npm sudo apt install nodejs 
-- $ npm laravel-echo-server 
-- $ npm install -g laravel-echo-server 
----
-- **Laravel Dependencies Requirement**
-- **predis laravel-echo socket.io-client ^2.4.0 issue Installation**
-- **Install fresh laravel via Composer laravel new laravel-socket-io Go to Laravel directory**
-- **cd Tagihboss-vue Add predis**
+1. $ npm sudo apt install nodejs 
+2. $ npm laravel-echo-server 
+3. $ npm install -g laravel-echo-server 
+4. **Laravel Dependencies Requirement**
+* **predis laravel-echo socket.io-client ^2.4.0 issue Installation**
+* **Install fresh laravel via Composer laravel new laravel-socket-io Go to Laravel directory**
+* **cd Tagihboss-vue Add predis**
 - $ composer require predis/predis Add laravel-echo and socket.io client 
 - $ npm install --save laravel-echo socket.io-client@2.4.0
 ---
-- **Create laravel-echo-server & configuration laravel-echo-server init Specify .env**
+5. **Create laravel-echo-server & configuration laravel-echo-server init Specify .env**
 - BROADCAST_DRIVER=redis
 - REDIS_HOST=127.0.0.1 
 - REDIS_PASSWORD=null 
 - REDIS_PORT=6379 
 - REDIS_CLIENT=predis 
 - REDIS_PREFIX=""
----
-**konfig .env**
+- .....
 - LARAVEL_ECHO_SERVER_REDIS_HOST=127.0.0.1 
 - LARAVEL_ECHO_SERVER_REDIS_PORT=6379 
 - LARAVEL_ECHO_SERVER_REDIS_PASSWORD=null
 ---
-**Finish**
+6. **Finish**
 - Start laravel-echo-server laravel-echo-server start
 - Start Laravel queue php artisan queue:listen redis --queue=default
 - Start Laravel app php artisan serve
